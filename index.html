@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FitCal Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="FitCal">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f2f7ee;--card:#fff;--tx:#10200a;--mu:#6b7d62;--ac:#4c9f1e;--ac2:#e8f4de;--bd:#dcebd0;--b2:#06b6d4;--or:#f59e0b;--pk:#ec4899;--sh:0 8px 28px rgba(40,90,10,.10)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050805;--card:#0f1a0b;--tx:#ecf7e4;--mu:#9bb590;--ac:#5cb023;--ac2:#17280f;--bd:#233a17;--sh:none}}
+:root[data-theme="dark"]{--bg:#050805;--card:#0f1a0b;--tx:#ecf7e4;--mu:#9bb590;--ac:#5cb023;--ac2:#17280f;--bd:#233a17;--sh:none}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:84px}
+header{background:radial-gradient(circle at 85% 0,rgba(108,193,42,.45) 0,transparent 45%),linear-gradient(135deg,#000,#0c1f06 55%,#2f6b12);color:#fff;padding:22px 16px 78px;border-radius:0 0 32px 32px}
+.top{max-width:760px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo small{font-size:13px!important;opacity:.92!important;margin-top:3px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.3px}.logo small{display:block;font-weight:400;font-size:12px;opacity:.85}
+.dn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:999px;padding:4px}
+.dn button{background:none;color:#fff;padding:6px 10px;font-size:16px}.dn span{font-size:13px;font-weight:600;min-width:92px;text-align:center}
+main{max-width:760px;margin:-52px auto 0;padding:0 14px}
+h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}
+button,.btn{background:var(--ac);color:#fff;border:0;border-radius:12px;padding:11px 14px;font-size:15px;font-weight:600;cursor:pointer;display:inline-block;font-family:inherit}
+button.sec,.btn.sec{background:var(--ac2);color:var(--ac)}button.x{background:none;color:var(--mu);padding:4px 8px}
+input,select,textarea{width:100%;font-family:inherit;padding:11px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:16px;font-family:inherit}
+label{font-size:12px;color:var(--mu);display:block;margin-bottom:3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mu{color:var(--mu);font-size:13px}.big{font-size:30px;font-weight:800;line-height:1.1}
+.hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+.ring{position:relative;width:150px;height:150px}.ring svg{transform:rotate(-90deg)}
+.ring div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.stat{background:var(--ac2);border-radius:14px;padding:10px;text-align:center}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:var(--mu)}
+.mb{margin:8px 0}.mb .l{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:3px}
+.bar{height:9px;border-radius:9px;background:var(--ac2);overflow:hidden}.bar i{display:block;height:100%;border-radius:9px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--bd);gap:8px}
+.item:first-of-type{border-top:0}.item b{font-size:14px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
+.chips button{background:var(--ac2);color:var(--ac);white-space:nowrap;padding:8px 13px;font-size:13px}.chips button.on{background:var(--ac);color:#fff}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;max-width:150px;background:none;color:var(--mu);border-radius:0;padding:9px 2px;font-size:11px}
+nav button.on{color:var(--ac)}nav span{display:block;font-size:21px}
+nav .cam{color:#fff}nav .cam span{background:var(--ac);border-radius:50%;width:46px;height:46px;line-height:46px;margin:-22px auto 0;box-shadow:0 6px 16px rgba(76,159,30,.45)}
+nav .cam.on{color:var(--ac)}
+.hide{display:none}img.pv{width:100%;max-height:300px;object-fit:cover;border-radius:14px;margin-bottom:10px}
+.warn{color:#e8590c;font-size:13px}svg text{fill:var(--mu);font-size:10px}
+.tag{font-size:11px;background:var(--ac2);color:var(--ac);border-radius:6px;padding:1px 6px;margin-left:4px}
+@media(min-width:700px){body{padding-bottom:0}header{padding-bottom:64px}main{margin-top:16px}nav{position:relative;max-width:732px;margin:-34px auto 0;border:1px solid var(--bd);border-radius:20px;box-shadow:var(--sh);padding:6px}nav button{padding:8px 2px;border-radius:14px}nav button.on{background:var(--ac2)}nav .cam span{margin:0 auto 2px;width:34px;height:34px;line-height:34px;font-size:18px}}
+.logo{display:flex;align-items:center;gap:12px}.logo img{width:78px;height:auto;border-radius:16px;flex:none}
+footer{text-align:center;color:var(--mu);font-size:12px;padding:10px 0 20px}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="logo"><img src="logo.png" alt="FABZZ"><div>FitCal Pro<small id="hi">Calorías, bebidas y progreso</small></div></div>
+<div class="dn"><button onclick="chDay(-1)">‹</button><span id="dl"></span><button onclick="chDay(1)">›</button></div></div></header>
+<nav>
+<button class="on" onclick="tab('hoy',this)"><span>🏠</span>Hoy</button>
+<button onclick="tab('add',this)"><span>🍽️</span>Agregar</button>
+<button class="cam" onclick="tab('foto',this)"><span>📸</span>Foto</button>
+<button onclick="tab('prog',this)"><span>📈</span>Progreso</button>
+<button onclick="tab('perfil',this)"><span>👤</span>Perfil</button>
+</nav>
+<main>
+<section id="t-hoy">
+ <div class="card"><div class="hero">
+  <div class="ring"><svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="var(--ac2)" stroke-width="14"/><circle id="rg" cx="75" cy="75" r="64" fill="none" stroke="var(--ac)" stroke-width="14" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/></svg>
+  <div><span class="big" id="rest">0</span><span class="mu">kcal restantes</span></div></div>
+  <div style="flex:1;min-width:200px"><div class="g3"><div class="stat"><b id="sMeta">0</b><span>Meta</span></div><div class="stat"><b id="sCons">0</b><span>Consumidas</span></div><div class="stat"><b id="sEx">0</b><span>Ejercicio</span></div></div>
+  <div id="mbars" style="margin-top:10px"></div></div></div></div>
+ <div class="card"><div class="row sp"><h2>🥤 Hidratación</h2><span class="mu" id="wTxt"></span></div>
+  <div class="bar"><i id="wBar" style="background:var(--b2);width:0"></i></div>
+  <div class="row" style="margin-top:10px"><button class="sec" onclick="water(-250)">− 250</button><button onclick="water(250)">+ 250 ml</button><button class="sec" onclick="water(500)">+ 500 ml</button></div></div>
+ <div id="meals"></div>
+ <div class="card"><div class="row sp"><h2>🏃 Ejercicio</h2><button class="sec" onclick="tab('add',document.querySelectorAll('nav button')[1]);sw('ex')">+ Agregar</button></div><div id="exl"></div></div>
+</section>
+
+<section id="t-add" class="hide">
+ <div class="card"><label>Agregar a</label><select id="meal"></select>
+  <div class="chips" style="margin-top:10px"><button class="on" id="b-txt" onclick="sw('txt')">✍️ Escribir</button><button id="b-food" onclick="sw('food')">🍎 Alimentos</button><button id="b-drink" onclick="sw('drink')">🥤 Bebidas</button><button id="b-ex" onclick="sw('ex')">🏃 Ejercicio</button><button id="b-cus" onclick="sw('cus')">➕ Personalizado</button></div>
+  <div id="s-txt"><label>Escribe lo que comiste o bebiste y la IA calcula gramos y calorías</label><textarea id="tq" rows="3" placeholder="Ej: 2 huevos fritos, 1 pan con palta y un café con leche" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();calcTxt()}"></textarea><button id="tgo" style="width:100%;margin-top:8px" onclick="calcTxt()">✨ Calcular calorías</button><div id="tst" class="mu" style="margin-top:8px"></div><div id="tres"></div></div>
+  <div id="s-list" class="hide"><input id="q" placeholder="Buscar…" oninput="rList()"><div id="lst" style="margin-top:8px"></div></div>
+  <div id="s-ex" class="hide"><div id="exs"></div></div>
+  <div id="s-cus" class="hide"><div class="g2"><div><label>Nombre</label><input id="cn"></div><div><label>Cantidad (g o ml)</label><input id="cg" type="number" value="100"></div>
+  <div><label>Calorías</label><input id="ck" type="number"></div><div><label>Proteína (g)</label><input id="cp" type="number" value="0"></div><div><label>Carbos (g)</label><input id="cc" type="number" value="0"></div><div><label>Grasas (g)</label><input id="cf" type="number" value="0"></div></div>
+  <button style="margin-top:10px;width:100%" onclick="addCus()">Agregar</button></div></div>
+</section>
+
+<section id="t-foto" class="hide">
+ <div class="card"><h2>📸 Calcular calorías con foto</h2>
+  <p class="mu" style="margin-top:0">Fotografía tu comida o bebida. La IA identifica lo que ve y estima porción y calorías (valores aproximados).</p>
+  <label>Agregar a</label><select id="mealF" style="margin-bottom:10px"></select>
+  <div class="row"><label class="btn" for="cam">📷 Tomar foto</label><label class="btn sec" for="gal">🖼️ Subir imagen</label></div>
+  <input type="file" id="cam" accept="image/*" capture="environment" class="hide"><input type="file" id="gal" accept="image/*" class="hide">
+  <div id="fotoBox" class="hide" style="margin-top:12px"><img id="pv" class="pv" alt="Vista previa"><button id="go" style="width:100%" onclick="analyze()">🔍 Analizar</button><div id="st" class="mu" style="margin-top:8px"></div></div></div>
+ <div id="res" class="card hide"></div>
+</section>
+
+<section id="t-prog" class="hide">
+ <div class="chips" id="rng"><button class="on" onclick="setR(7,this)">7 días</button><button onclick="setR(30,this)">30 días</button><button onclick="setR(365,this)">12 meses</button></div>
+ <div class="card"><h2 id="cT">Calorías diarias</h2><div id="chart"></div><div class="g3" style="margin-top:10px" id="pst"></div></div>
+ <div class="card"><h2>⚖️ Peso corporal</h2><div class="row"><input id="wi" type="number" step=".1" placeholder="kg de hoy" style="flex:1"><button onclick="addW()">Guardar</button></div><div id="wch" style="margin-top:10px"></div></div>
+ <div class="card"><div class="row sp"><h2>📅 Historial</h2><button class="sec" onclick="exp()">⬇️ Exportar CSV</button></div><div id="hist"></div></div>
+</section>
+
+<section id="t-perfil" class="hide">
+ <div class="card"><h2>Mi perfil y metas</h2><div class="g2">
+  <div><label>Sexo</label><select id="sx"><option value="m">Hombre</option><option value="f">Mujer</option></select></div><div><label>Edad</label><input id="ed" type="number" value="30"></div>
+  <div><label>Peso (kg)</label><input id="pe" type="number" value="70"></div><div><label>Altura (cm)</label><input id="al" type="number" value="170"></div>
+  <div><label>Actividad</label><select id="ac"><option value="1.2">Sedentario</option><option value="1.375">Ligera</option><option value="1.55" selected>Moderada</option><option value="1.725">Alta</option></select></div>
+  <div><label>Objetivo</label><select id="ob"><option value="-500">Bajar peso</option><option value="0" selected>Mantener</option><option value="400">Ganar músculo</option></select></div>
+  <div><label>Meta de agua (ml)</label><input id="wg" type="number" value="2000"></div><div><label>Meta manual kcal (opcional)</label><input id="mg" type="number" placeholder="auto"></div></div>
+  <button style="margin-top:12px;width:100%" onclick="calcP()">Calcular y guardar</button><div id="pr" style="margin-top:12px"></div></div>
+ <div class="card"><h2>🔌 Conexiones (sin Claude)</h2>
+  <label>Clave de Google Gemini (para foto y texto con IA)</label><input id="gk" type="password" placeholder="AIza..." autocomplete="off"><div class="mu" style="margin-top:4px">Clave gratis en aistudio.google.com/apikey</div>
+  <label style="margin-top:8px">Modelo</label><input id="gm" placeholder="gemini-flash-latest">
+  <label style="margin-top:8px">URL de Apps Script (copia en tu Google Drive, opcional)</label><input id="gu" placeholder="https://script.google.com/macros/s/.../exec">
+  <label style="margin:10px 0;display:flex;gap:8px;align-items:center"><input type="checkbox" id="ga" style="width:20px;height:20px"> Sincronizar automáticamente</label>
+  <button style="width:100%" onclick="saveConn()">Guardar conexiones</button>
+  <div class="row" style="margin-top:8px"><button class="sec" onclick="sheetsUp()">⬆ Subir a Drive</button><button class="sec" onclick="sheetsDown(true)">⬇ Descargar de Drive</button></div>
+  <div class="row" style="margin-top:8px"><button class="sec" onclick="expJ()">💾 Respaldo (.json)</button><label class="btn sec" for="ij">📂 Cargar respaldo</label><input type="file" id="ij" accept=".json" class="hide" onchange="impJ(event)"></div>
+  <div class="row" style="margin-top:8px"><button class="sec" onclick="expX()">📊 Exportar Excel</button><label class="btn sec" for="ix">📥 Importar Excel</label><input type="file" id="ix" accept=".xlsx,.xls,.csv" class="hide" onchange="impX(event)"></div>
+  <p class="mu">La clave y tus datos se guardan solo en este navegador. Haz un respaldo (Excel o .json) de vez en cuando.</p></div>
+ <div class="card"><h2>Datos</h2><button class="sec" onclick="if(confirm('¿Borrar TODO el historial?')){D=base();sv();rAll()}">🗑️ Borrar todos los datos</button></div>
+</section>
+<footer>FitCal Pro · Las calorías de foto son estimaciones · <span id="sync">💾 Guardado en este dispositivo</span></footer>
+</main>
+<script src="xlsx.full.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MEALS=[['des','🌅 Desayuno'],['alm','☀️ Almuerzo'],['cen','🌙 Cena'],['sna','🍪 Snacks'],['beb','🥤 Bebidas']];
+// Alimentos por 100 g: [nombre,kcal,P,C,G]
+const FO=[["Arroz blanco cocido",130,2.7,28,.3],["Pechuga de pollo",165,31,0,3.6],["Huevo",155,13,1.1,11],["Plátano",89,1.1,23,.3],["Manzana",52,.3,14,.2],["Pan integral",247,13,41,3.4],["Papa cocida",87,1.9,20,.1],["Avena",389,17,66,7],["Palta",160,2,9,15],["Atún en agua",116,26,0,1],["Lentejas cocidas",116,9,20,.4],["Fideos cocidos",158,5.8,31,.9],["Carne de res magra",250,26,0,15],["Salmón",208,20,0,13],["Queso fresco",264,18,3,20],["Yogur natural",61,3.5,4.7,3.3],["Brócoli",34,2.8,7,.4],["Tomate",18,.9,3.9,.2],["Almendras",579,21,22,50],["Pizza",266,11,33,10],["Hamburguesa",295,17,24,14],["Papas fritas",312,3.4,41,15],["Chocolate",546,5,61,31],["Cebiche",95,17,4,1.5],["Lomo saltado",150,10,12,7],["Quinua cocida",120,4.4,21,1.9],["Ensalada mixta",20,1.2,3.5,.2],["Helado",207,3.5,24,11],["Galletas",450,6,70,16],["Pan francés",270,9,52,3]];
+// Bebidas por 100 ml (porción típica ml)
+const DR=[["Agua",0,0,0,0,250],["Café negro",1,.1,0,0,200],["Café con leche",40,2,4,1.5,240],["Té",1,0,.3,0,250],["Jugo de naranja",45,.7,10,.2,250],["Jugo de papaya",45,.5,11,.1,250],["Limonada con azúcar",40,0,10,0,300],["Gaseosa",42,0,10.6,0,350],["Gaseosa light",1,0,0,0,350],["Leche entera",61,3.2,4.8,3.3,250],["Leche descremada",35,3.4,5,.1,250],["Batido de proteína",70,12,4,1,350],["Smoothie de fruta",55,1,12,.5,350],["Bebida energética",45,0,11,0,250],["Bebida isotónica",26,0,6.5,0,500],["Chicha morada",45,0,11,0,300],["Cerveza",43,.5,3.6,0,330],["Vino tinto",85,.1,2.6,0,150],["Pisco sour",160,0,12,0,120],["Whisky/Ron",230,0,0,0,45],["Chocolate caliente",77,3.2,11,2.5,250],["Agua de coco",19,.7,3.7,.2,330],["Yogur bebible",70,3,12,1.5,200]];
+const EX=[["Caminar",3.5],["Trotar",7],["Correr (10 km/h)",10],["Ciclismo",7.5],["Natación",7],["Pesas",5],["HIIT",9],["Yoga",3],["Baile / Zumba",6],["Fútbol",7.5],["Saltar cuerda",11],["Subir escaleras",8]];
+const base=()=>({days:{},goal:2000,wgoal:2000,w:{},prof:null});
+let D=base();try{const r=localStorage.getItem('fitcal2');if(r)D=Object.assign(base(),JSON.parse(r))}catch(e){}
+const LS=(k,v)=>{try{return v===undefined?localStorage.getItem(k):localStorage.setItem(k,v)}catch(e){}};
+let sT=null;
+const lsOnly=()=>LS('fitcal2',JSON.stringify(D));
+const sv=()=>{D.t=Date.now();lsOnly();clearTimeout(sT);sT=setTimeout(()=>{if(LS('fitcal_auto')==='1')sheetsUp()},1500)};
+const sync=m=>{const e=$('sync');if(e)e.textContent=m};
+// ---- IA de Google (Gemini) ----
+async function gem(prompt,blob){const key=LS('fitcal_gkey');if(!key)throw new Error('Falta tu clave de Gemini: ve a Perfil → Conexiones');
+ const parts=[{text:prompt}];
+ if(blob){const b64=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(blob)});parts.push({inline_data:{mime_type:'image/jpeg',data:b64}})}
+ const um=LS('fitcal_gmodel'),pref=(um&&um!=='gemini-flash-latest')?um:'gemini-flash-lite-latest';
+ const ms=[...new Set([pref,'gemini-2.5-flash-lite','gemini-flash-latest'])];let last;
+ for(let t=0;t<ms.length;t++){const m=ms[t],ac=new AbortController(),to=setTimeout(()=>ac.abort(),t?15000:9000);
+  if(t)['tst','st'].forEach(i=>{const e=$(i);if(e&&e.textContent&&!e.children.length)e.textContent='Google está lento, probando otro modelo ('+(t+1)+'/'+ms.length+')…'});
+  try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',signal:ac.signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts}],generationConfig:{responseMimeType:'application/json'}})});
+   const j=await r.json();if(!r.ok){const e=new Error((j.error&&j.error.message)||('Error '+r.status));e.st=r.status;throw e}
+   clearTimeout(to);return JSON.parse(j.candidates[0].content.parts[0].text)}
+  catch(e){clearTimeout(to);last=e.name==='AbortError'?new Error('Google tardó demasiado en responder'):e;if(e.st&&![429,500,503,504,404].includes(e.st))throw e}}
+ throw last}
+const SM=Object.assign(async()=>{},{limits:async()=>({images:true}),json:(p,o)=>gem(p,o&&o.images&&o.images[0])});
+const DL={save:async({filename,data})=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:filename.endsWith('.json')?'application/json':'text/csv'}));a.download=filename;a.click()}};
+const claude={use:async n=>n==='sample'?SM:n==='downloads'?DL:null};
+// ---- Copia en tu Google Drive (Apps Script) ----
+async function sheetsUp(){const u=LS('fitcal_url');if(!u)return;try{await fetch(u,{method:'POST',mode:'no-cors',body:JSON.stringify(D),headers:{'Content-Type':'text/plain'}});sync('☁️ Copia subida a tu Google Drive')}catch(e){sync('⚠️ No se pudo subir a Google Drive')}}
+async function sheetsDown(manual){const u=LS('fitcal_url');if(!u)return alert('Primero pega la URL de Apps Script y guarda');try{const r=await(await fetch(u)).json();if(r&&r.days&&(manual||(r.t||0)>(D.t||0))){D=Object.assign(base(),r);lsOnly();rAll();sync('☁️ Datos descargados de tu Google Drive');if(manual)alert('Datos descargados ✓')}else if(manual)alert('Aún no hay datos en tu Drive')}catch(e){sync('⚠️ No se pudo leer Google Drive');if(manual)alert('No se pudo leer. Revisa la URL y que el acceso sea "Cualquier persona".')}}
+async function cloudInit(){if(LS('fitcal_url')&&LS('fitcal_auto')==='1')await sheetsDown(false)}
+function saveConn(){LS('fitcal_gkey',$('gk').value.trim());LS('fitcal_gmodel',$('gm').value.trim()||'gemini-flash-latest');LS('fitcal_url',$('gu').value.trim());LS('fitcal_auto',$('ga').checked?'1':'0');alert('Conexiones guardadas ✓')}
+function loadConn(){$('gk').value=LS('fitcal_gkey')||'';$('gm').value=LS('fitcal_gmodel')||'gemini-flash-latest';$('gu').value=LS('fitcal_url')||'';$('ga').checked=LS('fitcal_auto')==='1'}
+function expJ(){LS('fitcal_lastbk',Date.now());bkNote();DL.save({filename:'fitcal-respaldo.json',data:JSON.stringify(D)})}
+function impJ(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.days)throw 0;D=Object.assign(base(),x);sv();rAll();alert('Respaldo cargado ✓')}catch(_){alert('Archivo no válido')}};r.readAsText(f);e.target.value=''}
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const TODAY=iso(new Date());let cur=TODAY,R=7,mode='txt';
+const day=k=>(D.days[k]=D.days[k]||{log:[],ex:[],water:0});
+const dget=k=>D.days[k]||{log:[],ex:[],water:0};
+const kc=k=>dget(k).log.reduce((a,i)=>a+i.k,0);
+const fmt=k=>{const d=new Date(k+'T12:00:00');return k===TODAY?'Hoy':d.toLocaleDateString('es',{weekday:'short',day:'numeric',month:'short'})};
+const tabs=['hoy','add','foto','prog','perfil'];
+function tab(n,b){tabs.forEach(x=>$('t-'+x).classList.toggle('hide',x!==n));document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));if(b)b.classList.add('on');if(n==='prog')rProg();scrollTo(0,0)}
+function goHoy(){tab('hoy',document.querySelectorAll('nav button')[0])}
+function chDay(n){const d=new Date(cur+'T12:00:00');d.setDate(d.getDate()+n);const k=iso(d);if(k>TODAY)return;cur=k;rHoy()}
+function rHoy(){
+ const d=dget(cur),t=d.log.reduce((a,i)=>({k:a.k+i.k,p:a.p+i.p,c:a.c+i.c,f:a.f+i.f}),{k:0,p:0,c:0,f:0}),ex=d.ex.reduce((a,i)=>a+i.k,0),goal=D.goal+ex;
+ $('dl').textContent=fmt(cur);{let s=0;const z=new Date();for(;;){if(kc(iso(z))>0)s++;else if(iso(z)!==TODAY)break;z.setDate(z.getDate()-1);if(s>999)break}const hr=new Date().getHours();$('hi').textContent=(hr<12?'Buenos días':hr<19?'Buenas tardes':'Buenas noches')+' 👋'+(s?` · 🔥 racha de ${s} día${s>1?'s':''}`:' · ¡registra tu primera comida!')}$('sMeta').textContent=D.goal;$('sCons').textContent=Math.round(t.k);$('sEx').textContent=Math.round(ex);
+ $('rest').textContent=Math.round(goal-t.k);$('rg').style.strokeDashoffset=402*(1-Math.min(1,t.k/goal));$('rg').style.stroke=t.k>goal?'#e8590c':'var(--ac)';
+ const pt=Math.round(D.goal*.25/4),ct=Math.round(D.goal*.5/4),ft=Math.round(D.goal*.25/9);
+ const mb=(l,v,m,c)=>`<div class="mb"><div class="l"><span>${l}</span><span>${Math.round(v)} / ${m} g</span></div><div class="bar"><i style="width:${Math.min(100,v/m*100)}%;background:${c}"></i></div></div>`;
+ $('mbars').innerHTML=mb('Proteína',t.p,pt,'var(--b2)')+mb('Carbohidratos',t.c,ct,'var(--or)')+mb('Grasas',t.f,ft,'var(--pk)');
+ $('wTxt').textContent=`${d.water} / ${D.wgoal} ml`;$('wBar').style.width=Math.min(100,d.water/D.wgoal*100)+'%';
+ $('meals').innerHTML=MEALS.map(([id,nm])=>{const it=d.log.map((x,i)=>({x,i})).filter(o=>o.x.m===id),s=it.reduce((a,o)=>a+o.x.k,0);
+  return `<div class="card"><div class="row sp"><h2>${nm} <span class="mu">${Math.round(s)} kcal</span></h2><button class="sec" onclick="addTo('${id}')">+</button></div>`+(it.length?it.map(o=>`<div class="item"><div><b>${esc(o.x.n)}</b>${o.x.src?`<span class="tag">${o.x.src}</span>`:''}<div class="mu">${o.x.g?o.x.g+(o.x.u||'g')+' · ':''}P${Math.round(o.x.p)} C${Math.round(o.x.c)} G${Math.round(o.x.f)}</div></div><div class="row"><b>${Math.round(o.x.k)}</b><button class="x" onclick="del(${o.i})">✕</button></div></div>`).join(''):'<div class="mu">Sin registros</div>')+'</div>'}).join('');
+ $('exl').innerHTML=d.ex.length?d.ex.map((e,i)=>`<div class="item"><div><b>${esc(e.n)}</b><div class="mu">${e.min} min</div></div><div class="row"><b>−${Math.round(e.k)}</b><button class="x" onclick="delEx(${i})">✕</button></div></div>`).join(''):'<div class="mu">Sin ejercicio registrado</div>'}
+function addTo(m){$('meal').value=m;tab('add',document.querySelectorAll('nav button')[1]);sw(m==='beb'?'drink':'food')}
+function add(o){day(cur).log.push(o);sv()}
+function del(i){day(cur).log.splice(i,1);sv();rHoy()}
+function delEx(i){day(cur).ex.splice(i,1);sv();rHoy()}
+function water(n){const d=day(cur);d.water=Math.max(0,d.water+n);sv();rHoy()}
+function sw(m){mode=m;['txt','food','drink','ex','cus'].forEach(x=>$('b-'+x).classList.toggle('on',x===m));$('s-txt').classList.toggle('hide',m!=='txt');$('s-list').classList.toggle('hide',m==='ex'||m==='cus'||m==='txt');$('s-ex').classList.toggle('hide',m!=='ex');$('s-cus').classList.toggle('hide',m!=='cus');if(m==='drink')$('meal').value='beb';else if($('meal').value==='beb')$('meal').value='alm';rList();rEx()}
+function rList(){const q=$('q').value.toLowerCase(),L=mode==='drink'?DR:FO,u=mode==='drink'?'ml':'g';
+ $('lst').innerHTML=L.map((f,i)=>({f,i})).filter(o=>o.f[0].toLowerCase().includes(q)).map(({f,i})=>`<div class="item"><div><b>${f[0]}</b><div class="mu">${f[1]} kcal/100${u} · P${f[2]} C${f[3]} G${f[4]}</div></div><div class="row" style="flex-wrap:nowrap"><input type="number" id="g${i}" value="${f[5]||100}" style="width:76px;padding:8px"><button onclick="addL(${i})">+</button></div></div>`).join('')||'<div class="mu">Sin resultados. Usa “Personalizado”.</div>'}
+function addL(i){const L=mode==='drink'?DR:FO,f=L[i],g=+$('g'+i).value||100,m=g/100;add({n:f[0],k:f[1]*m,p:f[2]*m,c:f[3]*m,f:f[4]*m,g,u:mode==='drink'?'ml':'g',m:$('meal').value});if(mode==='drink'&&f[0].startsWith('Agua'))day(cur).water+=g;sv();goHoy();rHoy()}
+function rEx(){const kg=+(D.prof&&D.prof.w)||70;$('exs').innerHTML=EX.map((e,i)=>`<div class="item"><div><b>${e[0]}</b><div class="mu">≈ ${Math.round(e[1]*3.5*kg/200)} kcal/min</div></div><div class="row" style="flex-wrap:nowrap"><input type="number" id="m${i}" value="30" style="width:76px;padding:8px"><button onclick="addEx(${i})">min</button></div></div>`).join('')}
+function addEx(i){const min=+$('m'+i).value||30,kg=+(D.prof&&D.prof.w)||70;day(cur).ex.push({n:EX[i][0],min,k:EX[i][1]*3.5*kg/200*min});sv();goHoy();rHoy()}
+function addCus(){const n=$('cn').value.trim(),k=+$('ck').value;if(!n||!k)return alert('Ingresa nombre y calorías');add({n,k,p:+$('cp').value,c:+$('cc').value,f:+$('cf').value,g:+$('cg').value,m:$('meal').value,src:'Propio'});$('cn').value=$('ck').value='';goHoy();rHoy()}
+function calcP(){const w=+$('pe').value,h=+$('al').value,a=+$('ed').value,m=$('sx').value==='m',bmr=10*w+6.25*h-5*a+(m?5:-161),td=bmr*+$('ac').value,auto=Math.round(Math.max(1200,td+ +$('ob').value));
+ D.goal=+$('mg').value||auto;D.wgoal=+$('wg').value||2000;D.prof={w,h,a,sx:$('sx').value,ac:$('ac').value,ob:$('ob').value};sv();rHoy();
+ const imc=w/((h/100)**2),cat=imc<18.5?'Bajo peso':imc<25?'Normal':imc<30?'Sobrepeso':'Obesidad';
+ $('pr').innerHTML=`<div class="g3"><div class="stat"><b>${Math.round(bmr)}</b><span>Basal</span></div><div class="stat"><b>${Math.round(td)}</b><span>Gasto diario</span></div><div class="stat"><b>${D.goal}</b><span>Tu meta</span></div></div><p class="mu">IMC <b>${imc.toFixed(1)}</b> (${cat}) · Proteína sugerida ~${Math.round(w*1.8)} g/día · Peso saludable ${Math.round(18.5*(h/100)**2)}–${Math.round(24.9*(h/100)**2)} kg</p>`}
+function loadP(){const p=D.prof;if(!p)return;$('pe').value=p.w;$('al').value=p.h;$('ed').value=p.a;$('sx').value=p.sx;$('ac').value=p.ac;$('ob').value=p.ob;$('wg').value=D.wgoal}
+// Progreso
+function setR(n,b){R=n;document.querySelectorAll('#rng button').forEach(x=>x.classList.remove('on'));b.classList.add('on');rProg()}
+function bars(data,goal,color){const W=700,H=170,n=data.length,mx=Math.max(goal*1.15,...data.map(d=>d.v),1),bw=W/n;
+ let s=`<svg viewBox="0 0 ${W} ${H+22}" width="100%"><line x1="0" x2="${W}" y1="${H-goal/mx*H}" y2="${H-goal/mx*H}" stroke="var(--or)" stroke-dasharray="5 4"/>`;
+ data.forEach((d,i)=>{const h=d.v/mx*H;s+=`<rect x="${i*bw+bw*.15}" y="${H-h}" width="${bw*.7}" height="${h}" rx="4" fill="${d.v>goal?'#e8590c':color}" opacity="${d.v?1:.25}"/>`;if(n<=12||i%5===0)s+=`<text x="${i*bw+bw/2}" y="${H+14}" text-anchor="middle">${d.l}</text>`});return s+'</svg>'}
+function rProg(){const data=[];const now=new Date();
+ if(R===365){$('cT').textContent='Promedio diario por mes';for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1),p=iso(d).slice(0,7),ks=Object.keys(D.days).filter(k=>k.startsWith(p)&&kc(k)>0);data.push({l:d.toLocaleDateString('es',{month:'short'}),v:ks.length?ks.reduce((a,k)=>a+kc(k),0)/ks.length:0,n:ks.length})}}
+ else{$('cT').textContent='Calorías diarias';for(let i=R-1;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);const k=iso(d);data.push({l:R===7?d.toLocaleDateString('es',{weekday:'short'}):d.getDate(),v:kc(k),n:kc(k)>0?1:0})}}
+ $('chart').innerHTML=bars(data,D.goal,'var(--ac)');const a=data.filter(d=>d.v>0),avg=a.length?a.reduce((s,d)=>s+d.v,0)/a.length:0;
+ $('pst').innerHTML=`<div class="stat"><b>${Math.round(avg)}</b><span>Promedio kcal</span></div><div class="stat"><b>${R===365?data.reduce((s,d)=>s+d.n,0):a.length}</b><span>Días registrados</span></div><div class="stat"><b>${a.filter(d=>R===365||d.v<=D.goal).length}</b><span>${R===365?'Meses activos':'Dentro de meta'}</span></div>`;
+ const ws=Object.keys(D.w).sort().slice(-30);$('wch').innerHTML=ws.length>1?(()=>{const v=ws.map(k=>D.w[k]),mn=Math.min(...v)-1,mx=Math.max(...v)+1,pts=v.map((x,i)=>`${i/(v.length-1)*680+10},${140-(x-mn)/(mx-mn)*130}`).join(' ');return `<svg viewBox="0 0 700 160" width="100%"><polyline points="${pts}" fill="none" stroke="var(--b2)" stroke-width="3"/><text x="10" y="156">${fmt(ws[0])}: ${v[0]} kg</text><text x="690" y="156" text-anchor="end">${fmt(ws[ws.length-1])}: ${v[v.length-1]} kg</text></svg>`})():'<div class="mu">Guarda tu peso varios días para ver la curva.</div>';
+ const ks=Object.keys(D.days).filter(k=>D.days[k].log.length).sort().reverse().slice(0,31);
+ $('hist').innerHTML=ks.length?ks.map(k=>`<div class="item" onclick="cur='${k}';goHoy();rHoy()" style="cursor:pointer"><div><b>${fmt(k)}</b> <span class="mu">${k}</span></div><b>${Math.round(kc(k))} kcal</b></div>`).join(''):'<div class="mu">Aún no hay registros.</div>'}
+function addW(){const v=+$('wi').value;if(!v)return;D.w[TODAY]=v;sv();$('wi').value='';rProg()}
+function exp(){LS('fitcal_lastbk',Date.now());bkNote();let c='fecha,comida,alimento,cantidad,kcal,proteina,carbos,grasas\n';Object.keys(D.days).sort().forEach(k=>D.days[k].log.forEach(i=>c+=`${k},${i.m},"${i.n}",${i.g||''},${Math.round(i.k)},${Math.round(i.p)},${Math.round(i.c)},${Math.round(i.f)}\n`));
+ claude.use('downloads').then(d=>d?d.save({filename:'fitcal-historial.csv',data:c}):alert('Descarga no disponible aquí')).catch(()=>{})}
+// Foto
+let blob=null,items=[];
+async function shrink(f){const u=URL.createObjectURL(f),im=new Image();await new Promise((r,j)=>{im.onload=r;im.onerror=j;im.src=u});const s=Math.min(1,1024/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.85))}
+async function onF(e){const f=e.target.files[0];if(!f)return;try{blob=await shrink(f);$('pv').src=URL.createObjectURL(blob);$('fotoBox').classList.remove('hide');$('res').classList.add('hide');$('st').textContent=''}catch(x){alert('No se pudo leer la imagen')}e.target.value=''}
+$('cam').onchange=onF;$('gal').onchange=onF;
+async function analyze(){if(!blob)return;const st=$('st');st.textContent='Analizando…';$('go').disabled=true;
+ try{const sm=await claude.use('sample');if(!sm){st.innerHTML='<span class="warn">Análisis con IA no disponible aquí. Usa “Agregar”.</span>';return}
+ const l=await sm.limits();if(!l||!l.images){st.innerHTML='<span class="warn">Este visor no admite imágenes.</span>';return}
+ const o=await sm.json('Eres nutricionista. Identifica cada alimento o bebida visible y estima porción (gramos o ml) y valores nutricionales de esa porción. Responde SOLO JSON: {"alimentos":[{"nombre":"español","cantidad":number,"unidad":"g"|"ml","kcal":number,"proteina":number,"carbos":number,"grasas":number}],"nota":"breve"}. Si no hay comida/bebida, alimentos vacío.',{images:[blob],cache:false});
+ items=(o.alimentos||[]).map(a=>({n:a.nombre,g:Math.round(a.cantidad),u:a.unidad==='ml'?'ml':'g',k:+a.kcal,p:+a.proteina,c:+a.carbos,f:+a.grasas}));showRes(o.nota);st.textContent=''}
+ catch(e){st.innerHTML='<span class="warn">No se pudo analizar ('+esc(e.message||e.code||'error')+'). Intenta de nuevo.</span>'}finally{$('go').disabled=false}}
+function showRes(n){const r=$('res');r.classList.remove('hide');if(!items.length){r.innerHTML='<h2>No detecté alimentos</h2><p class="mu">Prueba con otra foto más clara.</p>';return}
+ r.innerHTML=`<h2>Total estimado: ~${Math.round(items.reduce((a,i)=>a+i.k,0))} kcal</h2>`+items.map((i,x)=>`<div class="item"><div><b>${esc(i.n)}</b><div class="mu">${i.g}${i.u} · P${Math.round(i.p)} C${Math.round(i.c)} G${Math.round(i.f)}</div></div><div class="row"><b>${Math.round(i.k)}</b><button class="x" onclick="items.splice(${x},1);showRes()">✕</button></div></div>`).join('')+(n?`<p class="mu">${esc(n)}</p>`:'')+'<button style="width:100%" onclick="saveAll()">✅ Agregar al registro</button>'}
+function saveAll(){items.forEach(i=>add({...i,m:$('mealF').value,src:'📸'}));items=[];$('res').classList.add('hide');$('fotoBox').classList.add('hide');goHoy();rHoy()}
+let tI=[],tN='';
+async function calcTxt(){const q=$('tq').value.trim();if(!q)return;const st=$('tst');st.textContent='Calculando…';$('tgo').disabled=true;
+ try{const sm=await claude.use('sample');if(!sm){st.innerHTML='<span class="warn">El cálculo con IA no está disponible aquí. Usa Alimentos o Bebidas.</span>';return}
+ const o=await sm.json('Eres nutricionista. El usuario escribió lo que comió o bebió (puede incluir cantidades, marcas o platos típicos peruanos): "'+q+'". Separa cada alimento o bebida, estima la porción en gramos o ml (usa porciones típicas si no da cantidad) y los valores nutricionales de esa porción. Responde SOLO JSON: {"alimentos":[{"nombre":"español","cantidad":number,"unidad":"g"|"ml","kcal":number,"proteina":number,"carbos":number,"grasas":number}],"nota":"breve"}',{cache:false});
+ tI=(o.alimentos||[]).map(a=>{const i={n:a.nombre,g:Math.round(a.cantidad)||100,u:a.unidad==='ml'?'ml':'g',k:+a.kcal||0,p:+a.proteina||0,c:+a.carbos||0,f:+a.grasas||0};i.b={g:i.g,k:i.k,p:i.p,c:i.c,f:i.f};return i});tN=o.nota||'';tShow();st.textContent=''}
+ catch(e){st.innerHTML='<span class="warn">No se pudo calcular ('+esc(e.message||e.code||'error')+'). Intenta de nuevo.</span>'}finally{$('tgo').disabled=false}}
+function tScale(x,v){const i=tI[x],b=i.b,f=(+v||b.g)/b.g;i.g=Math.round(+v||b.g);i.k=b.k*f;i.p=b.p*f;i.c=b.c*f;i.f=b.f*f;tShow()}
+function tShow(){const r=$('tres');if(!tI.length){r.innerHTML='<p class="mu">No detecté alimentos. Prueba escribiéndolo distinto.</p>';return}
+ r.innerHTML=`<h3>Total: ~${Math.round(tI.reduce((a,i)=>a+i.k,0))} kcal <span class="mu">(edita la cantidad si hace falta)</span></h3>`+tI.map((i,x)=>`<div class="item"><div><b>${esc(i.n)}</b><div class="mu">P${Math.round(i.p)} C${Math.round(i.c)} G${Math.round(i.f)} · <b>${Math.round(i.k)} kcal</b></div></div><div class="row" style="flex-wrap:nowrap"><input type="number" value="${i.g}" onchange="tScale(${x},this.value)" style="width:76px;padding:8px"><span class="mu">${i.u}</span><button class="x" onclick="tI.splice(${x},1);tShow()">✕</button></div></div>`).join('')+(tN?`<p class="mu">${esc(tN)}</p>`:'')+'<button style="width:100%" onclick="tSave()">✅ Agregar al registro</button>'}
+function tSave(){tI.forEach(i=>add({n:i.n,g:i.g,u:i.u,k:i.k,p:i.p,c:i.c,f:i.f,m:$('meal').value,src:'✍️'}));tI=[];$('tq').value='';$('tres').innerHTML='';goHoy();rHoy()}
+
+// ---- Excel: exportar / importar ----
+const MN=Object.fromEntries(MEALS.map(([i,n])=>[i,n.replace(/^\S+\s/,'')]));
+const mid=v=>{v=String(v||'').trim().toLowerCase();const m=MEALS.find(([i,n])=>i===v||n.toLowerCase().includes(v));return m?m[0]:'sna'};
+const r1=x=>Math.round((+x||0)*10)/10;
+function expX(){if(!window.XLSX)return alert('No cargó la librería de Excel: xlsx.full.min.js debe estar junto a index.html');
+ const C=[],E=[],A=[],P=[],F=[];
+ Object.keys(D.days).sort().forEach(k=>{const d=D.days[k];d.log.forEach(i=>C.push({fecha:k,comida:MN[i.m]||i.m,alimento:i.n,cantidad:i.g||'',unidad:i.u||'g',kcal:r1(i.k),proteina:r1(i.p),carbos:r1(i.c),grasas:r1(i.f),origen:i.src||''}));d.ex.forEach(e=>E.push({fecha:k,ejercicio:e.n,minutos:e.min,kcal:Math.round(e.k)}));if(d.water)A.push({fecha:k,ml:d.water})});
+ Object.keys(D.w).sort().forEach(k=>P.push({fecha:k,kg:D.w[k]}));
+ const p=D.prof||{};[['meta_kcal',D.goal],['meta_agua_ml',D.wgoal],['peso',p.w],['altura',p.h],['edad',p.a],['sexo',p.sx],['actividad',p.ac],['objetivo',p.ob]].forEach(([k,v])=>{if(v!==undefined&&v!==null)F.push({clave:k,valor:v})});
+ const wb=XLSX.utils.book_new(),add=(n,a,h)=>XLSX.utils.book_append_sheet(wb,a.length?XLSX.utils.json_to_sheet(a):XLSX.utils.aoa_to_sheet([h]),n);
+ add('Comidas',C,['fecha','comida','alimento','cantidad','unidad','kcal','proteina','carbos','grasas','origen']);add('Ejercicio',E,['fecha','ejercicio','minutos','kcal']);add('Agua',A,['fecha','ml']);add('Peso',P,['fecha','kg']);add('Perfil',F,['clave','valor']);
+ XLSX.writeFile(wb,'fitcal-datos-'+TODAY+'.xlsx');LS('fitcal_lastbk',Date.now());bkNote()}
+function impX(e){const f=e.target.files[0];e.target.value='';if(!f)return;if(!window.XLSX)return alert('No cargó la librería de Excel');
+ const r=new FileReader();r.onload=()=>{try{
+  const wb=XLSX.read(r.result,{type:'array'}),S=n=>wb.Sheets[n]?XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:''}):[];
+  const C=S('Comidas'),E=S('Ejercicio'),A=S('Agua'),P=S('Peso'),F=S('Perfil');
+  const dk=v=>{const t=typeof v==='number'?new Date(Math.round((v-25569)*864e5)).toISOString().slice(0,10):String(v).trim().slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(t)?t:null};
+  if(![C,E,A,P].some(x=>x.length))throw new Error('El archivo no tiene las hojas Comidas, Ejercicio, Agua o Peso');
+  if(!confirm('Se importarán '+C.length+' comidas, '+E.length+' ejercicios, '+A.length+' días de agua y '+P.length+' pesos.\n\nLos días que vienen en el archivo reemplazan los de la app; los demás se conservan. ¿Continuar?'))return;
+  LS('fitcal_prev',JSON.stringify(D));
+  const nd=JSON.parse(JSON.stringify(D)),fresh=new Set(),fix=k=>{if(!fresh.has(k)){fresh.add(k);nd.days[k]={log:[],ex:[],water:0}}return nd.days[k]};
+  [C,E,A].forEach(L=>L.forEach(x=>{const k=dk(x.fecha);if(k)fix(k)}));
+  C.forEach(x=>{const k=dk(x.fecha);if(!k||!x.alimento)return;nd.days[k].log.push({n:String(x.alimento),g:+x.cantidad||0,u:x.unidad==='ml'?'ml':'g',k:+x.kcal||0,p:+x.proteina||0,c:+x.carbos||0,f:+x.grasas||0,m:mid(x.comida),...(x.origen?{src:String(x.origen)}:{})})});
+  E.forEach(x=>{const k=dk(x.fecha);if(k&&x.ejercicio)nd.days[k].ex.push({n:String(x.ejercicio),min:+x.minutos||0,k:+x.kcal||0})});
+  A.forEach(x=>{const k=dk(x.fecha);if(k)nd.days[k].water=+x.ml||0});
+  P.forEach(x=>{const k=dk(x.fecha);if(k&&+x.kg)nd.w[k]=+x.kg});
+  if(F.length){const m=Object.fromEntries(F.map(x=>[x.clave,x.valor]));if(+m.meta_kcal)nd.goal=+m.meta_kcal;if(+m.meta_agua_ml)nd.wgoal=+m.meta_agua_ml;if(+m.peso&&+m.altura)nd.prof={w:+m.peso,h:+m.altura,a:+m.edad||30,sx:m.sexo==='f'?'f':'m',ac:String(m.actividad||'1.55'),ob:String(m.objetivo||'0')}}
+  D=Object.assign(base(),nd);sv();rAll();alert('Excel importado ✓')}catch(x){alert('No se pudo importar: '+(x.message||'archivo no válido'))}};r.readAsArrayBuffer(f)}
+// ---- Protección de datos ----
+function bkNote(){const t=+LS('fitcal_lastbk')||0,d=t?Math.floor((Date.now()-t)/864e5):null;sync(d===null?'⚠️ Aún no has hecho respaldo (Perfil → Conexiones)':d>=7?'⚠️ Último respaldo hace '+d+' días':'💾 Guardado · respaldo hace '+(d?d+' días':'hoy'))}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+function rAll(){rHoy();rList();rEx();loadP()}
+const opts=MEALS.map(m=>`<option value="${m[0]}">${m[1]}</option>`).join('');$('meal').innerHTML=$('mealF').innerHTML=opts;
+const h=new Date().getHours(),dm=h<10?'des':h<15?'alm':h<20?'sna':'cen';$('meal').value=$('mealF').value=dm;
+rAll();sw('txt');loadConn();cloudInit();bkNote();
+</script>
+</body>
+</html>
