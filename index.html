@@ -117,6 +117,7 @@ footer{text-align:center;color:var(--mu);font-size:12px;padding:10px 0 20px}
  <div class="card"><h2>🔌 Conexiones (sin Claude)</h2>
   <label>Clave de Google Gemini (para foto y texto con IA)</label><input id="gk" type="password" placeholder="AIza..." autocomplete="off"><div class="mu" style="margin-top:4px">Clave gratis en aistudio.google.com/apikey</div>
   <label style="margin-top:8px">Modelo</label><input id="gm" placeholder="gemini-flash-latest">
+  <label style="margin-top:8px">Clave de Groq (respaldo gratis solo para texto, opcional)</label><input id="gq" type="password" placeholder="gsk_..." autocomplete="off"><div class="mu" style="margin-top:4px">Clave gratis en console.groq.com/keys · entra solo si Gemini tarda</div>
   <label style="margin-top:8px">URL de Apps Script (copia en tu Google Drive, opcional)</label><input id="gu" placeholder="https://script.google.com/macros/s/.../exec">
   <label style="margin:10px 0;display:flex;gap:8px;align-items:center"><input type="checkbox" id="ga" style="width:20px;height:20px"> Sincronizar automáticamente</label>
   <button style="width:100%" onclick="saveConn()">Guardar conexiones</button>
@@ -145,16 +146,22 @@ const lsOnly=()=>LS('fitcal2',JSON.stringify(D));
 const sv=()=>{D.t=Date.now();lsOnly();clearTimeout(sT);sT=setTimeout(()=>{if(LS('fitcal_auto')==='1')sheetsUp()},1500)};
 const sync=m=>{const e=$('sync');if(e)e.textContent=m};
 // ---- IA de Google (Gemini) ----
-async function gem(prompt,blob){const key=LS('fitcal_gkey');if(!key)throw new Error('Falta tu clave de Gemini: ve a Perfil → Conexiones');
+async function gem(prompt,blob){const key=LS('fitcal_gkey'),qk=LS('fitcal_qkey');if(!key&&!(qk&&!blob))throw new Error('Falta tu clave de Gemini: ve a Perfil → Conexiones');
  const parts=[{text:prompt}];
  if(blob){const b64=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(blob)});parts.push({inline_data:{mime_type:'image/jpeg',data:b64}})}
  const um=LS('fitcal_gmodel'),pref=(um&&um!=='gemini-flash-latest')?um:'gemini-flash-lite-latest';
- const ms=[...new Set([pref,'gemini-2.5-flash-lite','gemini-flash-latest','gemini-2.5-flash'])],acs=[];
+ const ms=key?[...new Set([pref,'gemini-2.5-flash-lite','gemini-flash-latest','gemini-2.5-flash'])]:[],acs=[];let done=false;
  const one=async m=>{const ac=new AbortController();acs.push(ac);const to=setTimeout(()=>ac.abort(),25000);
   try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',signal:ac.signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts}],generationConfig:{responseMimeType:'application/json'}})});
    const j=await r.json();if(!r.ok){const e=new Error((j.error&&j.error.message)||('Error '+r.status));e.st=r.status;throw e}
    return JSON.parse(j.candidates[0].content.parts[0].text)}finally{clearTimeout(to)}};
- try{const out=await Promise.any(ms.map(one));acs.forEach(a=>a.abort());return out}
+ const gq=async m=>{await new Promise(r=>setTimeout(r,key?3500:0));if(done){const k=new Error('skip');k.name='AbortError';throw k}
+  const ac=new AbortController();acs.push(ac);const to=setTimeout(()=>ac.abort(),25000);
+  try{const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',signal:ac.signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+qk},body:JSON.stringify({model:m,messages:[{role:'user',content:prompt}],response_format:{type:'json_object'},temperature:0.2})});
+   const j=await r.json();if(!r.ok){const e=new Error('Groq: '+((j.error&&j.error.message)||('Error '+r.status)));e.st=r.status;throw e}
+   return JSON.parse(j.choices[0].message.content)}finally{clearTimeout(to)}};
+ const rc=ms.map(one);if(qk&&!blob)rc.push(gq('llama-3.3-70b-versatile'),gq('llama-3.1-8b-instant'));
+ try{const out=await Promise.any(rc);done=true;acs.forEach(a=>a.abort());return out}
  catch(e){const er=e.errors||[e];throw er.find(x=>x.st&&![429,500,503,504,404].includes(x.st))||er.find(x=>x.name!=='AbortError')||new Error('Google tardó demasiado en responder')}}
 const SM=Object.assign(async()=>{},{limits:async()=>({images:true}),json:(p,o)=>gem(p,o&&o.images&&o.images[0])});
 const DL={save:async({filename,data})=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:filename.endsWith('.json')?'application/json':'text/csv'}));a.download=filename;a.click()}};
@@ -163,8 +170,8 @@ const claude={use:async n=>n==='sample'?SM:n==='downloads'?DL:null};
 async function sheetsUp(){const u=LS('fitcal_url');if(!u)return;try{await fetch(u,{method:'POST',mode:'no-cors',body:JSON.stringify(D),headers:{'Content-Type':'text/plain'}});sync('☁️ Copia subida a tu Google Drive')}catch(e){sync('⚠️ No se pudo subir a Google Drive')}}
 async function sheetsDown(manual){const u=LS('fitcal_url');if(!u)return alert('Primero pega la URL de Apps Script y guarda');try{const r=await(await fetch(u)).json();if(r&&r.days&&(manual||(r.t||0)>(D.t||0))){D=Object.assign(base(),r);lsOnly();rAll();sync('☁️ Datos descargados de tu Google Drive');if(manual)alert('Datos descargados ✓')}else if(manual)alert('Aún no hay datos en tu Drive')}catch(e){sync('⚠️ No se pudo leer Google Drive');if(manual)alert('No se pudo leer. Revisa la URL y que el acceso sea "Cualquier persona".')}}
 async function cloudInit(){if(LS('fitcal_url')&&LS('fitcal_auto')==='1')await sheetsDown(false)}
-function saveConn(){LS('fitcal_gkey',$('gk').value.trim());LS('fitcal_gmodel',$('gm').value.trim()||'gemini-flash-latest');LS('fitcal_url',$('gu').value.trim());LS('fitcal_auto',$('ga').checked?'1':'0');alert('Conexiones guardadas ✓')}
-function loadConn(){$('gk').value=LS('fitcal_gkey')||'';$('gm').value=LS('fitcal_gmodel')||'gemini-flash-latest';$('gu').value=LS('fitcal_url')||'';$('ga').checked=LS('fitcal_auto')==='1'}
+function saveConn(){LS('fitcal_gkey',$('gk').value.trim());LS('fitcal_qkey',$('gq').value.trim());LS('fitcal_gmodel',$('gm').value.trim()||'gemini-flash-latest');LS('fitcal_url',$('gu').value.trim());LS('fitcal_auto',$('ga').checked?'1':'0');alert('Conexiones guardadas ✓')}
+function loadConn(){$('gk').value=LS('fitcal_gkey')||'';$('gq').value=LS('fitcal_qkey')||'';$('gm').value=LS('fitcal_gmodel')||'gemini-flash-latest';$('gu').value=LS('fitcal_url')||'';$('ga').checked=LS('fitcal_auto')==='1'}
 function expJ(){LS('fitcal_lastbk',Date.now());bkNote();DL.save({filename:'fitcal-respaldo.json',data:JSON.stringify(D)})}
 function impJ(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.days)throw 0;D=Object.assign(base(),x);sv();rAll();alert('Respaldo cargado ✓')}catch(_){alert('Archivo no válido')}};r.readAsText(f);e.target.value=''}
 const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
