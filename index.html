@@ -111,6 +111,11 @@ footer{text-align:center;color:var(--mu);font-size:12px;padding:10px 0 20px}
  <div class="chips" id="rng"><button class="on" onclick="setR(7,this)">7 días</button><button onclick="setR(30,this)">30 días</button><button onclick="setR(365,this)">12 meses</button></div>
  <div class="card"><h2 id="cT">Calorías diarias</h2><div id="chart"></div><div class="g3" style="margin-top:10px" id="pst"></div></div>
  <div class="card"><h2>⚖️ Peso corporal</h2><div class="row"><input id="wi" type="number" step=".1" placeholder="kg de hoy" style="flex:1"><button onclick="addW()">Guardar</button></div><div id="wch" style="margin-top:10px"></div></div>
+ <div class="card"><h2>🧠 Tendencia de peso (IA)</h2>
+  <div class="chips" id="wrng"><button onclick="setWR(7,this)">7 días</button><button class="on" onclick="setWR(30,this)">30 días</button><button onclick="setWR(90,this)">90 días</button><button onclick="setWR(0,this)">Todo</button></div>
+  <div id="wa"></div>
+  <button id="wgo" style="width:100%;margin-top:10px" onclick="wAI()">🧠 Analizar con IA</button>
+  <div id="wst" class="mu" style="margin-top:6px"></div><div id="wres"></div></div>
  <div class="card"><div class="row sp"><h2>📅 Historial</h2><button class="sec" onclick="exp()">⬇️ Exportar CSV</button></div><div id="hist"></div></div>
 </section>
 
@@ -294,6 +299,49 @@ function impX(e){const f=e.target.files[0];e.target.value='';if(!f)return;if(!wi
   P.forEach(x=>{const k=dk(x.fecha);if(k&&+x.kg)nd.w[k]=+x.kg});
   if(F.length){const m=Object.fromEntries(F.map(x=>[x.clave,x.valor]));if(+m.meta_kcal)nd.goal=+m.meta_kcal;if(+m.meta_agua_ml)nd.wgoal=+m.meta_agua_ml;if(+m.peso&&+m.altura)nd.prof={w:+m.peso,h:+m.altura,a:+m.edad||30,sx:m.sexo==='f'?'f':'m',ac:String(m.actividad||'1.55'),ob:String(m.objetivo||'0')}}
   D=Object.assign(base(),nd);sv();rAll();alert('Excel importado ✓')}catch(x){alert('No se pudo importar: '+(x.message||'archivo no válido'))}};r.readAsArrayBuffer(f)}
+// ---- Tendencia de peso (estimación + IA) ----
+let WR=30;
+function setWR(n,b){WR=n;document.querySelectorAll('#wrng button').forEach(x=>x.classList.remove('on'));b.classList.add('on');rWA()}
+function wxCalc(){
+ const from=WR?iso(new Date(Date.now()-(WR-1)*864e5)):'0000-00-00',wk=Object.keys(D.w).sort(),wp=wk.filter(k=>k>=from),p=D.prof,last=wk.length?wk[wk.length-1]:null,lw=last?+D.w[last]:(p?+p.w:null);
+ let tdee=null;if(p&&p.h&&p.a){const w=lw||+p.w;tdee=(10*w+6.25*p.h-5*p.a+(p.sx==='m'?5:-161))*+p.ac}
+ const ex=k=>dget(k).ex.reduce((a,e)=>a+e.k,0),bal=k=>kc(k)-(tdee+ex(k));
+ const lk=Object.keys(D.days).filter(k=>k<TODAY&&kc(k)>0).sort(),inP=tdee?lk.filter(k=>k>=from):[],since=tdee?lk.filter(k=>!last||k>last):[];
+ const estP=inP.reduce((a,k)=>a+bal(k),0)/7700,estS=since.reduce((a,k)=>a+bal(k),0)/7700;
+ let real=null;if(wp.length>1){const a=wp[0],b=wp[wp.length-1];real={d:D.w[b]-D.w[a],days:Math.max(1,Math.round((new Date(b)-new Date(a))/864e5)),a,b}}
+ const avgK=inP.length?inP.reduce((a,k)=>a+kc(k),0)/inP.length:0;
+ return{from,wk,wp,last,lw,tdee,inP,since,estP,estS,real,avgK,estNow:lw!=null&&tdee?lw+estS:null,estBase:last?'último pesaje':'peso del perfil'}}
+function rWA(){const e=$('wa');if(!e)return;const c=wxCalc();
+ if(!c.real&&!c.tdee){e.innerHTML='<p class="mu">Guarda tu peso al menos 2 veces, o completa tu perfil y registra comidas, para estimar tu tendencia.</p>';rWR();return}
+ const ch=c.real?c.real.d:c.estP,src=c.real?'según tus pesajes':'estimado por calorías',th=.3,
+  ic=ch<-th?'📉':ch>th?'📈':'➖',tx=ch<-th?'Bajaste':ch>th?'Subiste':'Te mantienes estable',
+  wk=c.real?ch/c.real.days*7:(c.inP.length?c.estP/c.inP.length*7:null),sg=v=>(v>0?'+':'')+v.toFixed(1);
+ e.innerHTML=`<div class="row" style="gap:12px;margin-bottom:8px"><span style="font-size:34px">${ic}</span><div><div class="big" style="font-size:22px">${tx}${Math.abs(ch)>th?' ≈ '+Math.abs(ch).toFixed(1)+' kg':''}</div><div class="mu">${src}${c.real?' · '+fmt(c.real.a)+' → '+fmt(c.real.b):' · '+c.inP.length+' días registrados'}</div></div></div>
+ <div class="g3"><div class="stat"><b>${c.estNow!=null?c.estNow.toFixed(1)+' kg':'—'}</b><span>Peso estimado hoy</span></div><div class="stat"><b>${wk!=null?sg(wk)+' kg':'—'}</b><span>Ritmo por semana</span></div><div class="stat"><b>${c.inP.length?Math.round(c.avgK):'—'}</b><span>kcal/día promedio</span></div></div>
+ ${c.real&&c.tdee?`<p class="mu">Por tus calorías registradas el cambio esperado sería ${sg(c.estP)} kg (${c.inP.length} días con registro).</p>`:''}
+ <p class="mu">El peso estimado parte de ${c.last?'tu ':'tu '}${c.estBase} y suma el balance calórico (calorías − gasto − ejercicio, ≈7700 kcal por kg). Solo cuenta los días en que registraste comidas. Es una aproximación.</p>`;rWR()}
+function rWR(){const r=$('wres');if(!r)return;let o=null;try{o=JSON.parse(LS('fitcal_wai')||'null')}catch(_){}if(!o||!o.o){r.innerHTML='';return}
+ const x=o.o,ic={bajando:'📉',subiendo:'📈',estable:'➖'}[x.tendencia]||'🤔';
+ r.innerHTML=`<div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px"><div class="mu">Análisis de IA · ${new Date(o.t).toLocaleDateString('es',{day:'numeric',month:'short'})} · ${o.r?'últimos '+o.r+' días':'todo el historial'}</div>
+ <h3>${ic} ${esc(x.titulo||('Tendencia: '+x.tendencia))}</h3>
+ <div class="g3"><div class="stat"><b>${x.cambio_kg!=null&&!isNaN(+x.cambio_kg)?(+x.cambio_kg>0?'+':'')+(+x.cambio_kg).toFixed(1)+' kg':'—'}</b><span>Cambio aprox.</span></div><div class="stat"><b>${x.peso_estimado_kg!=null&&!isNaN(+x.peso_estimado_kg)?(+x.peso_estimado_kg).toFixed(1)+' kg':'—'}</b><span>Peso estimado</span></div><div class="stat"><b>${esc(x.confianza||'—')}</b><span>Confianza</span></div></div>
+ <p>${esc(x.resumen||'')}</p>${(x.detalles||[]).length?'<ul class="mu" style="padding-left:18px;margin:6px 0">'+x.detalles.map(d=>'<li>'+esc(d)+'</li>').join('')+'</ul>':''}${x.consejo?`<p><b>💡 ${esc(x.consejo)}</b></p>`:''}</div>`}
+async function wAI(){const st=$('wst'),b=$('wgo'),c=wxCalc();
+ if(!c.wk.length&&!c.inP.length){st.innerHTML='<span class="warn">Aún no hay datos: guarda tu peso o registra comidas primero.</span>';return}
+ st.textContent='Analizando tu historial…';b.disabled=true;
+ try{const days=Object.keys(D.days).filter(k=>k<=TODAY&&k>=c.from&&(kc(k)>0||dget(k).ex.length)).sort().slice(-120).map(k=>({fecha:k,kcal:Math.round(kc(k)),ejercicio_kcal:Math.round(dget(k).ex.reduce((a,e)=>a+e.k,0))})),
+  pes=Object.keys(D.w).sort().slice(-120).map(k=>({fecha:k,kg:D.w[k]})),p=D.prof;
+  const pr='Eres un nutricionista y entrenador. Analiza el historial de este usuario y detecta cómo cambió su peso. Hoy es '+TODAY+'. '+
+  'Periodo analizado: '+(WR?'últimos '+WR+' días':'todo el historial')+'. '+
+  'Pesajes registrados (kg): '+JSON.stringify(pes)+'. '+
+  'Calorías consumidas y ejercicio por día (solo días con registro; los días ausentes NO se registraron, no significa que no comió): '+JSON.stringify(days)+'. '+
+  'Perfil: '+JSON.stringify(p?{peso_perfil:p.w,altura_cm:p.h,edad:p.a,sexo:p.sx,actividad:p.ac,objetivo_kcal_ajuste:p.ob}:null)+', meta diaria '+D.goal+' kcal'+(c.tdee?', gasto diario estimado '+Math.round(c.tdee)+' kcal':'')+'. '+
+  'Cálculo previo de la app: cambio por pesajes '+(c.real?c.real.d.toFixed(1)+' kg':'sin datos')+', cambio estimado por balance calórico '+(c.tdee?c.estP.toFixed(1)+' kg':'sin datos')+'. '+
+  'Reglas: si hay pesajes, priorízalos sobre la estimación por calorías; si solo hay calorías, estima con ≈7700 kcal por kg y dilo claramente; ten en cuenta que el peso varía 1-2 kg por agua y comidas; si hay pocos datos baja la confianza y dilo; no inventes pesajes; no des consejos extremos. Responde en español, tono cercano, SOLO JSON: '+
+  '{"tendencia":"bajando"|"subiendo"|"estable"|"sin_datos","titulo":"frase corta, ej. Bajaste ~1.2 kg en 30 días","cambio_kg":number|null (negativo si bajó),"peso_estimado_kg":number|null,"confianza":"alta"|"media"|"baja","resumen":"2-3 frases","detalles":["máx 3 observaciones concretas con números"],"consejo":"un consejo breve y accionable"}';
+  const o=await gem(pr);LS('fitcal_wai',JSON.stringify({t:Date.now(),r:WR,o}));st.textContent='';rWR()}
+ catch(e){st.innerHTML='<span class="warn">No se pudo analizar ('+esc(e.message||'error')+'). Intenta de nuevo.</span>'}finally{b.disabled=false}}
+const _rP=rProg;rProg=function(){_rP();rWA()};
 // ---- Protección de datos ----
 function bkNote(){const t=+LS('fitcal_lastbk')||0,d=t?Math.floor((Date.now()-t)/864e5):null;sync(d===null?'⚠️ Aún no has hecho respaldo (Perfil → Conexiones)':d>=7?'⚠️ Último respaldo hace '+d+' días':'💾 Guardado · respaldo hace '+(d?d+' días':'hoy'))}
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
